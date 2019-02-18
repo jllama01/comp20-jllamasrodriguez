@@ -1,0 +1,20 @@
+/* Style */
+img{
+	height: 200px;
+	width: 200px;
+}
+
+h1 {
+	font-family: "Georgia", serif;
+	text-align: center;
+} 
+
+body {
+	background-image: url(thesimpsons.jpg);
+	text-align: center
+}
+
+p {
+	font-family: "Georgia", serif;
+	text-align: center;
+}
