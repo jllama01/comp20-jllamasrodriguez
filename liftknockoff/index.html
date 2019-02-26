@@ -1,0 +1,66 @@
+<!-- Assignment 2 -->
+<!-- My API KEY AIzaSyBQuJvggcFjNUvKiQPjMSVZKkBV2S2qUaw -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Comp20 Assignment 2</title>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQuJvggcFjNUvKiQPjMSVZKkBV2S2qUaw">
+			
+		</script>
+		<link rel="stylesheet" href="assignment2.css" />
+		<script type="text/javascript">
+
+		var latitude = 0;
+		var longitude = 0; 
+		var mylocation = new google.maps.LatLng(latitude, longitude);
+
+		var mapOptions = {
+				zoom: 8, 
+				center: mylocation,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+
+		var map 
+		var sticker
+		var informationWindow = new google.maps.InfoWindow();
+
+		function createMap(){
+			map = new google.maps.Map(document.getElementByID("myMap"), mapOptions);
+			getMyLocation ();
+		}
+
+		function getMyLocation(){
+			if (navigator.geolocation(){
+				navigator.geolocation.getCurrentPosition(){
+					latitude = position.coords.latitude;
+					longitude = position.coords.longitude;
+					prodiveMap();
+				});
+			}
+			else {
+				alert("This function is not supported");
+			}
+		}
+
+		function provideMap(){
+			mylocation = new google.maps.LatLng(latitude, longitude);
+
+			map.Panto(mylocation);
+
+			sticker = new google.maps.Marker({
+				position: mylocation,
+				title: "This is my location"
+
+			});
+		}
+
+		
+		</script>
+</head>
+<body onload="createMap()">
+<div id = "myMap"></div>
+<script></script>
+
+</body>
+</html>
