@@ -26,16 +26,16 @@
 		var informationWindow = new google.maps.InfoWindow();
 
 		function createMap(){
-			map = new google.maps.Map(document.getElementByID("myMap"), mapOptions);
+			map = new google.maps.Map(document.getElementById("myMap"), mapOptions);
 			getMyLocation ();
 		}
 
 		function getMyLocation(){
-			if (navigator.geolocation(){
-				navigator.geolocation.getCurrentPosition(){
+			if (navigator.geolocation()){
+				navigator.geolocation.getCurrentPosition(function(position){
 					latitude = position.coords.latitude;
 					longitude = position.coords.longitude;
-					prodiveMap();
+					provideMap();
 				});
 			}
 			else {
@@ -46,7 +46,7 @@
 		function provideMap(){
 			mylocation = new google.maps.LatLng(latitude, longitude);
 
-			map.Panto(mylocation);
+			map.panTo(mylocation);
 
 			sticker = new google.maps.Marker({
 				position: mylocation,
@@ -59,7 +59,7 @@
 		</script>
 </head>
 <body onload="createMap()">
-<div id = "myMap()"></div>
+<div id = "myMap"></div>
 <script></script>
 
 </body>
