@@ -69,13 +69,19 @@
 		function loadInfo(){
 			request = new XMLHttpRequest(); 
 
-			request.open(“POST”, "https://hans-moleman.herokuapp.com/rides", true);
+			request.open("POST", "https://hans-moleman.herokuapp.com/rides", true);
 
-			/*request.onreadystatechange = function(){
+			console.log("It's all GOOD 1");
+
+			request.onreadystatechange = function(){
 				if (request.readyState == 4 && request.status == 200) {
-					console.log("It's all GOOD");
+					console.log("It's all GOOD 2");
+					data = request.responseText;
+					console.log(data);
 				}
-			}*/
+			}
+
+			request.send("Tx8FuV5K", mylat, mylong); 
 		}
 
 		
