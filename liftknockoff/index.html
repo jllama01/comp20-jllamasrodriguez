@@ -27,8 +27,12 @@
 		var informationWindow = new google.maps.InfoWindow();
 
 		function createMap(){
+
 			map = new google.maps.Map(document.getElementById("myMap"), mapOptions);
 			getMyLocation();
+
+			loadInfo();
+
 		}
 
 		function getMyLocation(){
@@ -60,6 +64,18 @@
 				informationWindow.setContent(sticker.title);
 				informationWindow.open(map, sticker);
 			});
+		}
+
+		function loadInfo(){
+			request = new XMLHttpRequest(); 
+
+			request.open(“POST”, "https://hans-moleman.herokuapp.com/rides", true);
+
+			/*request.onreadystatechange = function(){
+				if (request.readyState == 4 && request.status == 200) {
+					console.log("It's all GOOD");
+				}
+			}*/
 		}
 
 		
