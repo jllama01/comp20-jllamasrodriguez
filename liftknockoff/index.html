@@ -1,4 +1,5 @@
 <!-- Assignment 2 -->
+<!-- My username Tx8FuV5K -->
 <!-- My API KEY AIzaSyBQuJvggcFjNUvKiQPjMSVZKkBV2S2qUaw -->
 <!DOCTYPE html>
 <html>
@@ -11,30 +12,30 @@
 		<link rel="stylesheet" href="assignment2.css" />
 		<script type="text/javascript">
 
-		var latitude = 0;
-		var longitude = 0; 
-		var mylocation = new google.maps.LatLng(latitude, longitude);
+		var mylat = 0;
+		var mylong = 0; 
+		var mylocation = new google.maps.LatLng(mylat, mylong);
 
 		var mapOptions = {
-				zoom: 8, 
+				zoom: 13, 
 				center: mylocation,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
 
-		var map 
-		var sticker
+		var map;
+		var sticker;
 		var informationWindow = new google.maps.InfoWindow();
 
 		function createMap(){
 			map = new google.maps.Map(document.getElementById("myMap"), mapOptions);
-			getMyLocation ();
+			getMyLocation();
 		}
 
 		function getMyLocation(){
-			if (navigator.geolocation()){
+			if (navigator.geolocation){
 				navigator.geolocation.getCurrentPosition(function(position){
-					latitude = position.coords.latitude;
-					longitude = position.coords.longitude;
+					mylat = position.coords.latitude;
+					mylong = position.coords.longitude;
 					provideMap();
 				});
 			}
@@ -44,7 +45,7 @@
 		}
 
 		function provideMap(){
-			mylocation = new google.maps.LatLng(latitude, longitude);
+			mylocation = new google.maps.LatLng(mylat, mylong);
 
 			map.panTo(mylocation);
 
@@ -52,6 +53,12 @@
 				position: mylocation,
 				title: "This is my location"
 
+			});
+			sticker.setMap(map);
+
+			google.maps.event.addListener(sticker, 'click', function() {
+				informationWindow.setContent(sticker.title);
+				informationWindow.open(map, sticker);
 			});
 		}
 
