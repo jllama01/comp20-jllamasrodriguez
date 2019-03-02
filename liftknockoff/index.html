@@ -26,6 +26,8 @@
 		var sticker;
 		var informationWindow = new google.maps.InfoWindow();
 
+		var parameters = "place holder";
+
 		function createMap(){
 
 			map = new google.maps.Map(document.getElementById("myMap"), mapOptions);
@@ -40,6 +42,7 @@
 				navigator.geolocation.getCurrentPosition(function(position){
 					mylat = position.coords.latitude;
 					mylong = position.coords.longitude;
+					console.log("1 mylat is ", mylat, "mylong is ", mylong);
 					provideMap();
 				});
 			}
@@ -71,17 +74,26 @@
 
 			request.open("POST", "https://hans-moleman.herokuapp.com/rides", true);
 
-			console.log("It's all GOOD 1");
+			request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
 
 			request.onreadystatechange = function(){
 				if (request.readyState == 4 && request.status == 200) {
-					console.log("It's all GOOD 2");
+	
 					data = request.responseText;
 					console.log(data);
-				}
-			}
+					console.log("2 mylat is ", mylat, "mylong is ", mylong);
+					mylat = mylat.toString();
+					mylong = mylong.toString();
+					console.log("3 mylat is ", mylat, "mylong is ", mylong);
 
-			request.send("username=Tx8FuV5K&lat=mylat&lng=mylong"); 
+				}
+			};
+			parameters = 'username=Tx8FuV5K&lat=' + mylat + '&lng=' + mylong;
+
+			//request.send('username=Tx8FuV5K&lat=42.4054182&lng=-71.1213614'); 
+			console.log(" 2 parameters is ", parameters);
+			request.send(parameters);
 
 		}
 
