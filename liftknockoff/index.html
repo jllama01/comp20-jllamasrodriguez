@@ -24,9 +24,36 @@
 
 		var map;
 		var sticker;
-		var informationWindow = new google.maps.InfoWindow();
+	
+		//var informationWindow = new google.maps.InfoWindow();
 
 		var parameters = "place holder";
+
+		var vehiclesName;
+
+		//var carlocation; 
+
+		var myIcon = {
+				url: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
+				size: new google.maps.Size(20, 32),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(0, 32)
+			}
+
+			var car = {
+				url: "car.png",
+				size: new google.maps.Size(30, 100),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(0, 32)
+
+			}
+
+			var weinermobile = {
+				url: "weinermobile.png",
+				size: new google.maps.Size(100, 100),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(0, 32)
+			}
 
 		function createMap(){
 
@@ -52,13 +79,16 @@
 		}
 
 		function provideMap(){
+			var informationWindow = new google.maps.InfoWindow();
+
 			mylocation = new google.maps.LatLng(mylat, mylong);
 
 			map.panTo(mylocation);
 
 			sticker = new google.maps.Marker({
 				position: mylocation,
-				title: "This is my location"
+				title: "This is my location. Username: Tx8FuV5K",
+				icon: myIcon,
 
 			});
 			sticker.setMap(map);
@@ -67,6 +97,58 @@
 				informationWindow.setContent(sticker.title);
 				informationWindow.open(map, sticker);
 			});
+		}
+
+		function updateMyWindow(distanceWeiner){
+
+			var data = "Username: Tx8FuV5K. The WEINERMOBILE is " + distanceWeiner + " miles from my location";
+
+			var informationWindow = new google.maps.InfoWindow({
+								content: data
+							})
+
+			var sticker = new google.maps.Marker({
+				position: mylocation,
+				title: "This is my location",
+				icon: myIcon,
+
+			});
+			sticker.setMap(map);
+
+			google.maps.event.addListener(sticker, 'click', function() {
+				//informationWindow.setContent(sticker.title);
+				informationWindow.open(map, sticker);
+			});
+
+		}
+
+		Number.prototype.toRad = function() {
+   			return this * Math.PI / 180;
+		}
+
+		function calculateDistanceBetween(lat1, lng1, lat2, lng2){
+
+
+			//var location1 = new google.maps.LatLng(lat1, lng1);
+			//var location2 = new google.maps.LatLng(lat2, lng2);
+
+			var R = 6371;
+			var x1 = lat2-lat1;
+			var dLat = x1.toRad();  
+			var x2 = lng2-lng1;
+			var dLng = x2.toRad();  
+			var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+            Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+            Math.sin(dLng/2) * Math.sin(dLng/2);  
+			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+			var distance = R * c; 
+
+			distance = distance/1.852;
+
+			//console.log("The distance bewtween these points is ", distance, " miles");
+
+			return distance;
+
 		}
 
 		function loadInfo(){
@@ -80,18 +162,104 @@
 			request.onreadystatechange = function(){
 				if (request.readyState == 4 && request.status == 200) {
 	
-					data = request.responseText;
-					console.log(data);
-					console.log("2 mylat is ", mylat, "mylong is ", mylong);
+					parsed = JSON.parse(request.responseText);
+					console.log(parsed);
+
+					console.log("Vehicles length is ", parsed['vehicles'].length);
+
+					for (count = 0 ; count < parsed['vehicles'].length ; count++) {
+						vehiclesName = parsed['vehicles'][count]['username'];
+
+						console.log("vehicle Name ", count, " is ", vehiclesName);	
+
+						var carlat = parsed['vehicles'][count]['lat'];
+						console.log("Car lat is ", carlat);
+
+						var carlng = parsed['vehicles'][count]['lng'];
+						
+						console.log("Car lng is ", carlng);
+
+						carlocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
+
+						if (vehiclesName == 'WEINERMOBILE')
+						{
+							vehiclesName = vehiclesName.toString();
+
+							var weinercarLocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
+
+							var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+							distance = distance.toString();
+
+							var data = "The " + vehiclesName + " is " + distance + " miles from my location";
+
+							var weinerSticker = new google.maps.Marker({
+							position: weinercarLocation,
+							title: vehiclesName,
+							icon: weinermobile,
+
+							});
+						
+							weinerSticker.setMap(map);
+
+							var informationWindow = new google.maps.InfoWindow({
+								content: data
+							});
+
+							updateMyWindow(distance);
+
+							google.maps.event.addListener(weinerSticker, 'click', function() {
+							//informationWindow.setContent(weinerSticker.title);
+							informationWindow.open(map, weinerSticker);
+							});
+
+						}
+						else
+						{
+							vehiclesName = vehiclesName.toString();
+
+							var carlocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
+
+							var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+							distance = distance.toString();
+
+							var data = "The " + vehiclesName + " car is " + distance + " miles from my location";
+
+							carsticker = new google.maps.Marker({
+							position: carlocation,
+							title: vehiclesName,
+							icon: car,
+
+							});
+						
+							carsticker.setMap(map);
+
+							var carinformationWindow = new google.maps.InfoWindow({
+								content: data
+							})
+
+							google.maps.event.addListener(carsticker, 'click', (function(carsticker, data, carinformationWindow) {
+								return function() {
+									carinformationWindow.setContent(data);
+									carinformationWindow.open(map, carsticker);
+								};
+							})(carsticker, data, carinformationWindow));
+
+							
+
+							/*google.maps.event.addListener(carsticker, 'click', function() {
+							carinformationWindow.open(map, carsticker);
+							});*/
+
+						}
+					}
+
 					mylat = mylat.toString();
 					mylong = mylong.toString();
-					console.log("3 mylat is ", mylat, "mylong is ", mylong);
 
 				}
 			};
 			parameters = 'username=Tx8FuV5K&lat=' + mylat + '&lng=' + mylong;
-
-			//request.send('username=Tx8FuV5K&lat=42.4054182&lng=-71.1213614'); 
+ 
 			console.log(" 2 parameters is ", parameters);
 			request.send(parameters);
 

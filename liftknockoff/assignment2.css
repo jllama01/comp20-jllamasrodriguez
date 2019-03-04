@@ -12,6 +12,11 @@ body {
 	padding: 0px;
 }
 
+.image {
+	height: 20px;
+	width: 32px;
+}
+
 #myMap {
 	width: 100%;
 	height: 100%;
