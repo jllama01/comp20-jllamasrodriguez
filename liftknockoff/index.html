@@ -12,6 +12,13 @@
 		<link rel="stylesheet" href="assignment2.css" />
 		<script type="text/javascript">
 
+		var iscar = new Boolean(false);
+		var ispassenger = new Boolean(false);
+		var lowest;
+		var carINFO = "There is no one in sight";
+
+		var locationsArray = [];
+
 		var mylat = 0;
 		var mylong = 0; 
 		var mylocation = new google.maps.LatLng(mylat, mylong);
@@ -24,14 +31,13 @@
 
 		var map;
 		var sticker;
-	
-		//var informationWindow = new google.maps.InfoWindow();
 
 		var parameters = "place holder";
 
 		var vehiclesName;
+		var passengersName;
 
-		//var carlocation; 
+		var weinermobileINFO = "The WEINERMOBILE is nowhere to be seen!";
 
 		var myIcon = {
 				url: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
@@ -40,20 +46,27 @@
 				anchor: new google.maps.Point(0, 32)
 			}
 
-			var car = {
-				url: "car.png",
-				size: new google.maps.Size(30, 100),
-				origin: new google.maps.Point(0, 0),
-				anchor: new google.maps.Point(0, 32)
+		var car = {
+			url: "car.png",
+			size: new google.maps.Size(30, 100),
+			origin: new google.maps.Point(0, 0),
+			anchor: new google.maps.Point(0, 32)
 
 			}
 
-			var weinermobile = {
-				url: "weinermobile.png",
-				size: new google.maps.Size(100, 100),
-				origin: new google.maps.Point(0, 0),
-				anchor: new google.maps.Point(0, 32)
-			}
+		var weinermobile = {
+			url: "weinermobile.png",
+			size: new google.maps.Size(100, 100),
+			origin: new google.maps.Point(0, 0),
+			anchor: new google.maps.Point(0, 32)
+		}
+
+		var passengerIcon = {
+			path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+			scale: 5,
+			strokeWeight:2,
+			strokeColor:"#B40404"
+		}
 
 		function createMap(){
 
@@ -62,6 +75,17 @@
 
 			loadInfo();
 
+		}
+
+		function getClosest(array){
+			console.log("Your array is ", array);
+
+			var shortest = Math.min.apply(null, array);
+			console.log("The shortest is ", shortest);
+			shortest = shortest.toString();
+
+			carINFO = "The nearest car/passenger is " + shortest + " miles away from my location!";
+			updateMyWindow();
 		}
 
 		function getMyLocation(){
@@ -99,13 +123,11 @@
 			});
 		}
 
-		function updateMyWindow(distanceWeiner){
+		function updateMyWindow(){
 
-			var data = "Username: Tx8FuV5K. The WEINERMOBILE is " + distanceWeiner + " miles from my location";
+			var data = "Username: Tx8FuV5K: " + carINFO + " and " + weinermobileINFO;
 
-			var informationWindow = new google.maps.InfoWindow({
-								content: data
-							})
+			var informationWindow = new google.maps.InfoWindow();
 
 			var sticker = new google.maps.Marker({
 				position: mylocation,
@@ -115,10 +137,12 @@
 			});
 			sticker.setMap(map);
 
-			google.maps.event.addListener(sticker, 'click', function() {
-				//informationWindow.setContent(sticker.title);
-				informationWindow.open(map, sticker);
-			});
+			google.maps.event.addListener(sticker, 'click', (function(sticker, data, informationWindow) {
+					return function() {
+					informationWindow.setContent(data);
+					informationWindow.open(map, sticker);
+				};
+			})(sticker, data, informationWindow));
 
 		}
 
@@ -151,75 +175,68 @@
 
 		}
 
-		function loadInfo(){
-			request = new XMLHttpRequest(); 
+		function carCase(parsed){
+			console.log("Vehicles length is ", parsed['vehicles'].length);
 
-			request.open("POST", "https://hans-moleman.herokuapp.com/rides", true);
+			for (count = 0 ; count < parsed['vehicles'].length ; count++) {
+				vehiclesName = parsed['vehicles'][count]['username'];
 
-			request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+				console.log("vehicle Name ", count, " is ", vehiclesName);	
 
+				var carlat = parsed['vehicles'][count]['lat'];
+				console.log("Car lat is ", carlat);
 
-			request.onreadystatechange = function(){
-				if (request.readyState == 4 && request.status == 200) {
-	
-					parsed = JSON.parse(request.responseText);
-					console.log(parsed);
-
-					console.log("Vehicles length is ", parsed['vehicles'].length);
-
-					for (count = 0 ; count < parsed['vehicles'].length ; count++) {
-						vehiclesName = parsed['vehicles'][count]['username'];
-
-						console.log("vehicle Name ", count, " is ", vehiclesName);	
-
-						var carlat = parsed['vehicles'][count]['lat'];
-						console.log("Car lat is ", carlat);
-
-						var carlng = parsed['vehicles'][count]['lng'];
+				var carlng = parsed['vehicles'][count]['lng'];
 						
-						console.log("Car lng is ", carlng);
+				console.log("Car lng is ", carlng);
 
-						carlocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
+				carlocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
 
-						if (vehiclesName == 'WEINERMOBILE')
-						{
-							vehiclesName = vehiclesName.toString();
+				if (vehiclesName == 'WEINERMOBILE')
+					{
+						vehiclesName = vehiclesName.toString();
 
-							var weinercarLocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
+						var weinercarLocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
 
-							var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+						var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
 							distance = distance.toString();
 
-							var data = "The " + vehiclesName + " is " + distance + " miles from my location";
+						var data = "The " + vehiclesName + " is " + distance + " miles from me!";
 
-							var weinerSticker = new google.maps.Marker({
-							position: weinercarLocation,
-							title: vehiclesName,
-							icon: weinermobile,
+						var weinerSticker = new google.maps.Marker({
+						position: weinercarLocation,
+						title: vehiclesName,
+						icon: weinermobile,
 
-							});
+						});
 						
-							weinerSticker.setMap(map);
+						weinerSticker.setMap(map);
 
-							var informationWindow = new google.maps.InfoWindow({
-								content: data
-							});
+						var informationWindow = new google.maps.InfoWindow();
 
-							updateMyWindow(distance);
+						weinermobileINFO = "The weinermobile is " + distance + " miles from me!";
+						console.log(weinermobileINFO);
 
-							google.maps.event.addListener(weinerSticker, 'click', function() {
-							//informationWindow.setContent(weinerSticker.title);
-							informationWindow.open(map, weinerSticker);
-							});
+						updateMyWindow();
 
-						}
-						else
+						google.maps.event.addListener(weinerSticker, 'click', (function(weinerSticker, data, informationWindow) {
+							return function() {
+								informationWindow.setContent(data);
+								informationWindow.open(map, weinerSticker);
+							};
+						})(weinerSticker, data, informationWindow));
+
+					}
+					else
 						{
 							vehiclesName = vehiclesName.toString();
 
 							var carlocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
 
 							var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+
+							locationsArray.push(distance);
+
 							distance = distance.toString();
 
 							var data = "The " + vehiclesName + " car is " + distance + " miles from my location";
@@ -233,9 +250,9 @@
 						
 							carsticker.setMap(map);
 
-							var carinformationWindow = new google.maps.InfoWindow({
-								content: data
-							})
+							var carinformationWindow = new google.maps.InfoWindow();
+
+
 
 							google.maps.event.addListener(carsticker, 'click', (function(carsticker, data, carinformationWindow) {
 								return function() {
@@ -244,17 +261,139 @@
 								};
 							})(carsticker, data, carinformationWindow));
 
-							
+						}
+					}
 
-							/*google.maps.event.addListener(carsticker, 'click', function() {
-							carinformationWindow.open(map, carsticker);
-							});*/
+		}
+
+		function passengerCase(parsed){
+
+			console.log("Vehicles length is ", parsed['vehicles'].length);
+
+			for (count = 0 ; count < parsed['passengers'].length ; count++) {
+				vehiclesName = parsed['passengers'][count]['username'];
+
+				console.log("vehicle Name ", count, " is ", vehiclesName);	
+
+				var carlat = parsed['passengers'][count]['lat'];
+				console.log("Car lat is ", carlat);
+
+				var carlng = parsed['passengers'][count]['lng'];
+						
+				console.log("Car lng is ", carlng);
+
+				carlocation = new google.maps.LatLng(parsed['passengers'][count]['lat'], parsed['passengers'][count]['lng']);
+
+				if (vehiclesName == 'WEINERMOBILE')
+					{
+						vehiclesName = vehiclesName.toString();
+
+						var weinercarLocation = new google.maps.LatLng(parsed['passengers'][count]['lat'], parsed['passengers'][count]['lng']);
+
+						var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+							distance = distance.toString();
+
+						var data = "The " + vehiclesName + " is " + distance + " miles from me!";
+
+						var weinerSticker = new google.maps.Marker({
+						position: weinercarLocation,
+						title: vehiclesName,
+						icon: weinermobile,
+
+						});
+						
+						weinerSticker.setMap(map);
+
+						var informationWindow = new google.maps.InfoWindow();
+
+						updateMyWindow();
+
+						google.maps.event.addListener(weinerSticker, 'click', (function(weinerSticker, data, informationWindow) {
+							return function() {
+								informationWindow.setContent(data);
+								informationWindow.open(map, weinerSticker);
+							};
+						})(weinerSticker, data, informationWindow));
+
+						}
+					else
+						{
+							vehiclesName = vehiclesName.toString();
+
+							var carlocation = new google.maps.LatLng(parsed['passengers'][count]['lat'], parsed['passengers'][count]['lng']);
+
+							var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+							distance = distance.toString();
+
+							var data = "The " + vehiclesName + " passengers is " + distance + " miles from my location";
+
+							carsticker = new google.maps.Marker({
+							position: carlocation,
+							title: vehiclesName,
+							icon: passengerIcon,
+
+							});
+						
+							carsticker.setMap(map);
+
+							var carinformationWindow = new google.maps.InfoWindow();
+
+							google.maps.event.addListener(carsticker, 'click', (function(carsticker, data, carinformationWindow) {
+								return function() {
+									carinformationWindow.setContent(data);
+									carinformationWindow.open(map, carsticker);
+								};
+							})(carsticker, data, carinformationWindow));
 
 						}
 					}
 
+
+		}
+
+		function loadInfo(){
+			request = new XMLHttpRequest(); 
+
+			request.open("POST", "https://hans-moleman.herokuapp.com/rides", true);
+
+			request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+
+			request.onreadystatechange = function(){
+				if (request.readyState == 4 && request.status == 200) {
+	
+					parsed = JSON.parse(request.responseText, function(key, value){
+						if (key == 'vehicles'){
+							iscar = true;
+						}
+						else if(key == 'passengers'){
+							ispassenger = true;
+						}
+					});
+
+					parsed = JSON.parse(request.responseText);
+
+					console.log("parsed is ", parsed);
+
+					if(iscar) { 
+						console.log("THESE ARE CARS");
+						carCase(parsed);
+					}
+					else if (ispassenger){
+
+						console.log("THESE ARE PASSENGERS!!!");
+
+						passengerCase(parsed);
+
+					}
+					else{
+						console.log("SOMETHING IS WRONG");
+					}
+
 					mylat = mylat.toString();
 					mylong = mylong.toString();
+
+					getClosest(locationsArray);
 
 				}
 			};
@@ -264,7 +403,6 @@
 			request.send(parameters);
 
 		}
-
 		
 		</script>
 </head>
