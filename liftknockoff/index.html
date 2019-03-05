@@ -4,6 +4,7 @@
 <html>
 <head>
 	<title>Comp20 Assignment 2</title>
+	<meta charset="UTF-8">
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQuJvggcFjNUvKiQPjMSVZKkBV2S2qUaw">
 			
@@ -159,7 +160,8 @@
 			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
 			var distance = R * c; 
 
-			distance = distance/1.852;
+			//distance = distance/1.852;
+			//distance = distance * 0.00062137;
 
 			return distance;
 
@@ -261,11 +263,13 @@
 
 				if (vehiclesName == 'WEINERMOBILE')
 					{
+
 						vehiclesName = vehiclesName.toString();
 
 						var weinercarLocation = new google.maps.LatLng(parsed['passengers'][count]['lat'], parsed['passengers'][count]['lng']);
 
 						var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+
 							distance = distance.toString();
 
 						var data = "The " + vehiclesName + " is " + distance + " miles from me!";
@@ -280,6 +284,8 @@
 						weinerSticker.setMap(map);
 
 						var informationWindow = new google.maps.InfoWindow();
+
+						weinermobileINFO = "The weinermobile is " + distance + " miles from me!";
 
 						updateMyWindow();
 
@@ -298,6 +304,9 @@
 							var carlocation = new google.maps.LatLng(parsed['passengers'][count]['lat'], parsed['passengers'][count]['lng']);
 
 							var distance = calculateDistanceBetween(mylat, mylong, carlat, carlng);
+
+							locationsArray.push(distance);
+
 							distance = distance.toString();
 
 							var data = "The " + vehiclesName + " passengers is " + distance + " miles from my location";
@@ -339,9 +348,11 @@
 					parsed = JSON.parse(request.responseText, function(key, value){
 						if (key == 'vehicles'){
 							iscar = true;
+							ispassenger = false;
 						}
 						else if(key == 'passengers'){
 							ispassenger = true;
+							iscar = false;
 						}
 					});
 
