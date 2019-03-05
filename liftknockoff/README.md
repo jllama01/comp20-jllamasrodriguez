@@ -9,7 +9,7 @@ Identify what aspects of the work have been correctly implemented and what have 
 Identify anyone with whom you have collaborated or discussed the assignment.
 - I go thelp from Piazza questions, from Kingsley when I attended his office hours, and from some websites listed on the assingment. I got the distance between calculations from the two websites listed in the assignment page: https://stackoverflow.com/questions/14560999/using-the-haversine-formula-in-javascript, http://www.movable-type.co.uk/scripts/latlong.html. Some additional sources I consulted include the class Github examples and the google maps developer website: https://developers.google.com/maps/documentation/javascript/markers#icons
 
-Say approximately how many hours you have spent completing the assignment.
+Say approximately how many hours you have spent completing the assignment
 - I spent approximately 30 hours working on this assignment. 
 
 
