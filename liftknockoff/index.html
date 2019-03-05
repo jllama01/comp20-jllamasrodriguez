@@ -78,10 +78,8 @@
 		}
 
 		function getClosest(array){
-			console.log("Your array is ", array);
 
 			var shortest = Math.min.apply(null, array);
-			console.log("The shortest is ", shortest);
 			shortest = shortest.toString();
 
 			carINFO = "The nearest car/passenger is " + shortest + " miles away from my location!";
@@ -93,7 +91,6 @@
 				navigator.geolocation.getCurrentPosition(function(position){
 					mylat = position.coords.latitude;
 					mylong = position.coords.longitude;
-					console.log("1 mylat is ", mylat, "mylong is ", mylong);
 					provideMap();
 				});
 			}
@@ -152,10 +149,6 @@
 
 		function calculateDistanceBetween(lat1, lng1, lat2, lng2){
 
-
-			//var location1 = new google.maps.LatLng(lat1, lng1);
-			//var location2 = new google.maps.LatLng(lat2, lng2);
-
 			var R = 6371;
 			var x1 = lat2-lat1;
 			var dLat = x1.toRad();  
@@ -169,26 +162,18 @@
 
 			distance = distance/1.852;
 
-			//console.log("The distance bewtween these points is ", distance, " miles");
-
 			return distance;
 
 		}
 
 		function carCase(parsed){
-			console.log("Vehicles length is ", parsed['vehicles'].length);
 
 			for (count = 0 ; count < parsed['vehicles'].length ; count++) {
 				vehiclesName = parsed['vehicles'][count]['username'];
 
-				console.log("vehicle Name ", count, " is ", vehiclesName);	
-
 				var carlat = parsed['vehicles'][count]['lat'];
-				console.log("Car lat is ", carlat);
 
 				var carlng = parsed['vehicles'][count]['lng'];
-						
-				console.log("Car lng is ", carlng);
 
 				carlocation = new google.maps.LatLng(parsed['vehicles'][count]['lat'], parsed['vehicles'][count]['lng']);
 
@@ -215,7 +200,6 @@
 						var informationWindow = new google.maps.InfoWindow();
 
 						weinermobileINFO = "The weinermobile is " + distance + " miles from me!";
-						console.log(weinermobileINFO);
 
 						updateMyWindow();
 
@@ -268,19 +252,11 @@
 
 		function passengerCase(parsed){
 
-			console.log("Vehicles length is ", parsed['vehicles'].length);
-
 			for (count = 0 ; count < parsed['passengers'].length ; count++) {
 				vehiclesName = parsed['passengers'][count]['username'];
 
-				console.log("vehicle Name ", count, " is ", vehiclesName);	
-
 				var carlat = parsed['passengers'][count]['lat'];
-				console.log("Car lat is ", carlat);
-
 				var carlng = parsed['passengers'][count]['lng'];
-						
-				console.log("Car lng is ", carlng);
 
 				carlocation = new google.maps.LatLng(parsed['passengers'][count]['lat'], parsed['passengers'][count]['lng']);
 
@@ -348,7 +324,6 @@
 						}
 					}
 
-
 		}
 
 		function loadInfo(){
@@ -373,21 +348,11 @@
 
 					parsed = JSON.parse(request.responseText);
 
-					console.log("parsed is ", parsed);
-
 					if(iscar) { 
-						console.log("THESE ARE CARS");
 						carCase(parsed);
 					}
 					else if (ispassenger){
-
-						console.log("THESE ARE PASSENGERS!!!");
-
 						passengerCase(parsed);
-
-					}
-					else{
-						console.log("SOMETHING IS WRONG");
 					}
 
 					mylat = mylat.toString();
@@ -398,10 +363,7 @@
 				}
 			};
 			parameters = 'username=Tx8FuV5K&lat=' + mylat + '&lng=' + mylong;
- 
-			console.log(" 2 parameters is ", parameters);
 			request.send(parameters);
-
 		}
 		
 		</script>
