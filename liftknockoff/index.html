@@ -19,8 +19,8 @@
 
 		var locationsArray = [];
 
-		var mylat = 0;
-		var mylong = 0; 
+		var mylat = 42.4044704;
+		var mylong = -71.1180716; 
 		var mylocation = new google.maps.LatLng(mylat, mylong);
 
 		var mapOptions = {
@@ -121,6 +121,8 @@
 		}
 
 		function updateMyWindow(){
+
+			console.log("CARINFO IS ", carINFO)
 
 			var data = "Username: Tx8FuV5K: " + carINFO + " and " + weinermobileINFO;
 
@@ -337,7 +339,8 @@
 		function loadInfo(){
 			request = new XMLHttpRequest(); 
 
-			request.open("POST", "https://hans-moleman.herokuapp.com/rides", true);
+			//request.open("POST", "https://hans-moleman.herokuapp.com/rides", true);
+			request.open("POST", "https://enigmatic-savannah-43287.herokuapp.com/rides", true);
 
 			request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
@@ -359,16 +362,40 @@
 					parsed = JSON.parse(request.responseText);
 
 					if(iscar) { 
-						carCase(parsed);
+						if (parsed['vehicles'].length == 0){
+							console.log("There are ", parsed['vehicles'].length, "vehicles right now")
+							var carINFO = "There is no one in sight";
+							updateMyWindow()
+						} 
+						else 
+							{
+								carCase(parsed);
+							}
 					}
 					else if (ispassenger){
-						passengerCase(parsed);
+						if (parsed['passengers'].length == 0){
+							var carINFO = "There is no one in sight";
+							updateMyWindow()
+						}
+						else {
+							passengerCase(parsed);
+						}
+						
 					}
 
 					mylat = mylat.toString();
 					mylong = mylong.toString();
 
-					getClosest(locationsArray);
+					if (iscar){
+						if (parsed['vehicles'].length != 0){
+						getClosest(locationsArray);
+					}
+					}
+					else if(ispassenger){
+						if (parsed['passengers'].length != 0){
+						getClosest(locationsArray);
+					}
+					}
 
 				}
 			};
