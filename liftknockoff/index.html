@@ -122,8 +122,6 @@
 
 		function updateMyWindow(){
 
-			console.log("CARINFO IS ", carINFO)
-
 			var data = "Username: Tx8FuV5K: " + carINFO + " and " + weinermobileINFO;
 
 			var informationWindow = new google.maps.InfoWindow();
@@ -363,7 +361,6 @@
 
 					if(iscar) { 
 						if (parsed['vehicles'].length == 0){
-							console.log("There are ", parsed['vehicles'].length, "vehicles right now")
 							var carINFO = "There is no one in sight";
 							updateMyWindow()
 						} 
